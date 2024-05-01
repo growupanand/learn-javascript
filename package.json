@@ -1,0 +1,4 @@
+{
+    "name": "learn-javascript-workspaces",
+    "workspaces": ["packages/*"]
+  }

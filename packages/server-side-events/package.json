@@ -1,5 +1,5 @@
 {
-  "name": "express-server",
+  "name": "@workspace/server-side-events",
   "version": "1.0.0",
   "description": "",
   "scripts": {
