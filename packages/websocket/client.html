@@ -1,0 +1,59 @@
+<html>
+
+<head>
+    <title>Client</title>
+    <!-- https://socket.io/docs/v4/client-installation/#standalone-build -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+    const socket = io();
+
+    socket.on('connect', () => {
+        console.log('Connected to websocket server');
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Disconnected from websocket server');
+    });
+
+    socket.on('data', (data) => {
+        console.log('Server data received:', data);
+    });
+
+    socket.on('conversation:demo', (data) => {
+        const {eventType, eventData} = data;
+        switch (eventType) {
+            case 'answer':
+                console.log('user answered', eventData);
+                break;
+            case 'question':
+                console.error('question asked:', eventData);
+                break;
+            default:
+                console.error('Unknown event type:', eventType);
+        }
+    })
+
+    
+
+    const sendData = () => {
+        socket.emit('data', "Hello from client");
+    }
+
+    const sendAnswer = (answer) => {
+        socket.emit('conversation', {
+            eventType: 'answer',
+            eventData: {answer, conversationId: 'demo'}
+        })
+    }
+
+
+    </script>
+</head>
+
+<body>
+    <h1>Client page</h1>
+    <button onclick="sendData()">Send request</button>
+    <button onclick="sendAnswer('my name is utkarsh')">Send answer</button>
+
+</html>
