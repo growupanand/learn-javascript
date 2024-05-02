@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "dev": "nodemon --ext ts,html --exec ts-node index.ts",
-    "build": "webpack",
+    "build": "rm -rf ./build && webpack",
     "start": "node build/index.js"
   },
   "author": "",
@@ -18,6 +18,7 @@
     "@types/node": "^20.12.7",
     "html-webpack-plugin": "^5.6.0",
     "nodemon": "^3.1.0",
+    "socket.io-client": "^4.7.5",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",

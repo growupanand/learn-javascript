@@ -16,7 +16,7 @@
 
         const decoder = new TextDecoder();
         const handleSendRequest = async () => {
-            const response = await fetch('http://localhost:3000/stream');
+            const response = await fetch('/stream');
             const reader = response.body.getReader();
             while (true) {
                 const { done, value } = await reader.read();
@@ -30,7 +30,7 @@
 
         // ========= 2. Using EventSource =========
 
-        const eventSource = new EventSource('http://localhost:3000/stream');
+        const eventSource = new EventSource('/stream');
         eventSource.addEventListener('customMessage', (event) => {
             console.log({
                 eventData: event.data,

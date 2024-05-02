@@ -17,8 +17,8 @@ const io = new Server(server);
 app.use(express.json()); 
 
 
-app.get('/client', async (req, res)=>{
-    res.sendFile(__dirname + '/client.html');
+app.get('/', async (req, res)=>{
+    res.sendFile(__dirname + '/index.html');
 })
 
 

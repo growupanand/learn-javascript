@@ -3,7 +3,9 @@
 <head>
     <title>Client</title>
     <!-- https://socket.io/docs/v4/client-installation/#standalone-build -->
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
+        integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
+        crossorigin="anonymous"></script>
     <script>
 
         const socket = io();
@@ -42,7 +44,7 @@
             const answerText = getAnswerText();
             socket.emit('conversation', {
                 eventType: 'answer',
-                eventData: { answer : answerText, conversationId: 'demo', clientId },
+                eventData: { answer: answerText, conversationId: 'demo', clientId },
             })
         }
 
@@ -61,13 +63,13 @@
 <body>
     <h1>Client page</h1>
     <button onclick="sendData()">Send request</button>
-    <br/>
-    <br/>
+    <br />
+    <br />
     <label for="client-id-input">Client Id</label>
     <input type="text" name="clientId" id="client-id-input" />
     <label for="answer-input">Answer</label>
     <input id="answer-input" type="text" name="answer" />
-    <br/>
+    <br />
     <button onclick="sendAnswer()">Send answer</button>
 
 </html>

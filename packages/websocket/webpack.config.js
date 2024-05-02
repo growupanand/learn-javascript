@@ -4,6 +4,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     entry: './index.ts',
     target: 'node',
+    mode: "production",
+    node: false,
     module: {
         rules: [
             {
@@ -22,7 +24,11 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: 'client.html',
+            template: 'index.html',
         }),
     ],
+    externals: {
+        bufferutil: "bufferutil",
+        "utf-8-validate": "utf-8-validate",
+    },
 };
