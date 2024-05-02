@@ -43,10 +43,19 @@ io.on('connection', (socket) => {
       const {eventType, eventData} = data;
       switch(eventType){
         case 'answer':
+          const answer = eventData.answer;
+          const clientId = eventData.clientId;
+          // Emit to all clients connected to the socket server
+          io.emit(`conversation:${eventData.conversationId}`, {
+            eventType: 'answer',
+            eventData: `client:${clientId} (to all) answered: ${answer}`,
+          });
+
+          // Emit to the sender only
           socket.emit(`conversation:${eventData.conversationId}`, {
             eventType: 'answer',
-            eventData: eventData.answer
-          })
+            eventData: `client:${clientId} (only to sender) answered: ${answer}`,
+          });
           break;
         default:
           console.log(`Unknown event type: ${eventType}\n`);
