@@ -1,0 +1,75 @@
+<html>
+
+<head>
+    <title>Client</title>
+    <!-- https://socket.io/docs/v4/client-installation/#standalone-build -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
+        integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
+        crossorigin="anonymous"></script>
+    <script>
+
+        const socket = io();
+
+        socket.on('connect', () => {
+            console.log('Connected to websocket server');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from websocket server');
+        });
+
+        socket.on('data', (data) => {
+            console.log('Server data received:', data);
+        });
+
+        socket.on('conversation:demo', (data) => {
+            const { eventType, eventData, clientId } = data;
+            switch (eventType) {
+                case 'answer':
+                    console.log(eventData);
+                    break;
+                default:
+                    console.error('Unknown event type:', eventType);
+            }
+        })
+
+
+
+        const sendData = () => {
+            socket.emit('data', "Hello from client");
+        }
+
+        const sendAnswer = () => {
+            const clientId = getClientId();
+            const answerText = getAnswerText();
+            socket.emit('conversation', {
+                eventType: 'answer',
+                eventData: { answer: answerText, conversationId: 'demo', clientId },
+            })
+        }
+
+        function getClientId() {
+            return document.getElementById('client-id-input').value;
+        }
+
+        function getAnswerText() {
+            return document.getElementById('answer-input').value;
+        }
+
+
+    </script>
+</head>
+
+<body>
+    <h1>Client page</h1>
+    <button onclick="sendData()">Send request</button>
+    <br />
+    <br />
+    <label for="client-id-input">Client Id</label>
+    <input type="text" name="clientId" id="client-id-input" />
+    <label for="answer-input">Answer</label>
+    <input id="answer-input" type="text" name="answer" />
+    <br />
+    <button onclick="sendAnswer()">Send answer</button>
+
+</html>

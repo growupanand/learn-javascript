@@ -2,50 +2,25 @@
 
 <head>
     <title>Client</title>
-    <!-- https://socket.io/docs/v4/client-installation/#standalone-build -->
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
-        integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
-        crossorigin="anonymous"></script>
     <script>
+        const socket = new WebSocket('ws://localhost:3000');
 
-        const socket = io();
-
-        socket.on('connect', () => {
+        socket.addEventListener('open', () => {
             console.log('Connected to websocket server');
         });
 
-        socket.on('disconnect', () => {
+        socket.addEventListener('close', () => {
             console.log('Disconnected from websocket server');
         });
 
-        socket.on('data', (data) => {
-            console.log('Server data received:', data);
+        socket.addEventListener('message', (event) => {
+            console.log('Server data received:', event.data);
         });
 
-        socket.on('conversation:demo', (data) => {
-            const { eventType, eventData, clientId } = data;
-            switch (eventType) {
-                case 'answer':
-                    console.log(eventData);
-                    break;
-                default:
-                    console.error('Unknown event type:', eventType);
-            }
-        })
-
-
-
         const sendData = () => {
-            socket.emit('data', "Hello from client");
-        }
-
-        const sendAnswer = () => {
-            const clientId = getClientId();
+            const clientId = getClientId()
             const answerText = getAnswerText();
-            socket.emit('conversation', {
-                eventType: 'answer',
-                eventData: { answer: answerText, conversationId: 'demo', clientId },
-            })
+            socket.send(`client: ${clientId} - ${answerText}`);
         }
 
         function getClientId() {
@@ -55,7 +30,6 @@
         function getAnswerText() {
             return document.getElementById('answer-input').value;
         }
-
 
     </script>
 </head>
@@ -70,6 +44,6 @@
     <label for="answer-input">Answer</label>
     <input id="answer-input" type="text" name="answer" />
     <br />
-    <button onclick="sendAnswer()">Send answer</button>
+    <button onclick="sendData()">Send answer</button>
 
 </html>

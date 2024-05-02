@@ -1,71 +1,59 @@
-import express from "express";
-import {Server} from "socket.io";
 import { createServer } from "http";
-
-const app = express();
-const port = 3000; 
-const server = createServer(app);
-const io = new Server(server);
+import WebSocket from "ws";
+import { readFileSync } from "fs";
+import { resolve } from "path";
 
 
+const PORT = 3000;
 
 /**
  * ============ HTTP SERVER ============
  */
 
+const server = createServer((req, res) => {
+  if (req.url === '/') {
+    const data = readFileSync(resolve(__dirname, './index.html'));
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(data);
+  } else {
+    res.writeHead(404);
+    res.end();
+  }
+});
 
-app.use(express.json()); 
-
-
-app.get('/', async (req, res)=>{
-    res.sendFile(__dirname + '/index.html');
-})
-
-
+server.listen(PORT, () => {
+  console.log(`http (http://) server started on port:${PORT}`)
+});
 
 /**
  * ============ WEBSOCKET SERVER ============
  */
 
-io.on('connection', (socket) => {
-    console.log(`Connected client:${socket.id}\n`);
-    socket.on('disconnect', () => {
-      console.log(`Disconnected client:${socket.id}\n`);
+const wss = new WebSocket.Server({ server });
+
+console.log(`websocket (ws://) server started on port:${PORT}`)
+
+
+wss.on('connection', (ws) => {
+    console.log('Client connected');
+
+    ws.on('close', () => {
+      console.log('Client disconnected');
     });
 
-    socket.emit('data', 'Hello from server');
+    ws.on('message', (message) => {
+      console.log(message.toString());
+      // Send message to sender client only
+      ws.send("send to only sender client");
 
-    socket.on('data', (data) => {
-      console.log(`Client data received: ${data}\n`);
-    })
+      // Send message to every client connected
+      wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send("send to all client");
+        }
+      });
+    });
 
-    socket.on('conversation', (data) => {
-      const {eventType, eventData} = data;
-      switch(eventType){
-        case 'answer':
-          const answer = eventData.answer;
-          const clientId = eventData.clientId;
-          // Emit to all clients connected to the socket server
-          io.emit(`conversation:${eventData.conversationId}`, {
-            eventType: 'answer',
-            eventData: `client:${clientId} (to all) answered: ${answer}`,
-          });
-
-          // Emit to the sender only
-          socket.emit(`conversation:${eventData.conversationId}`, {
-            eventType: 'answer',
-            eventData: `client:${clientId} (only to sender) answered: ${answer}`,
-          });
-          break;
-        default:
-          console.log(`Unknown event type: ${eventType}\n`);
-      }
-    })
-
+    ws.send('Hello from server');
 });
 
-
-
-server.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
