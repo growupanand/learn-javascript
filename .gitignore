@@ -131,3 +131,8 @@ dist
 
 build
 .vercel
+
+
+# Ignore package.json or root because render.com does not allow deployment of projects with workspaces
+/package.json
+/package-lock.json
