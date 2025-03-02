@@ -3,49 +3,14 @@
 <head>
     <title>Client</title>
     <script>
-
-        /**
-         * Two ways to receive data from server side event
-         * 1. Using fetch
-         * 2. Using EventSource
-        **/
-
-
-
-        // ======== 1. Using fetch ==========
-
-        const decoder = new TextDecoder();
-        const handleSendRequest = async () => {
-            const response = await fetch('/stream');
-            const reader = response.body.getReader();
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) {
-                    break;
-                }
-                const decodedValue = decoder.decode(value);
-                console.log({ decodedValue })
-            }
-        }
-
-        // ========= 2. Using EventSource =========
-
-        const eventSource = new EventSource('/stream');
-        eventSource.addEventListener('customMessage', (event) => {
-            console.log({
-                eventData: event.data,
-                event
-            });
+        const eventEmitter = new EventTarget();
+        eventEmitter.addEventListener("customEvent1", (...eventParams) => {
+            console.log("customEvent1 fired:", eventParams);
         })
 
-        eventSource.addEventListener('jsonData', (event) => {
-            const eventData = JSON.parse(event.data);
-            console.log({
-                eventData,
-                event
-            });
-        })
-
+        eventEmitter.dispatchEvent(new CustomEvent("customEvent1", {
+            detail: "hello"
+        }));
 
     </script>
 </head>
@@ -53,6 +18,8 @@
 <body>
     <h1>Client</h1>
     <p>Client page</p>
-    <button onclick="handleSendRequest()">Send request</button>
+    <button onclick="eventEmitter.dispatchEvent(new CustomEvent('customEvent1', {
+        detail: 'hello'
+    }))">test event</button>
 
 </html>
