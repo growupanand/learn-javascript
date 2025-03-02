@@ -1,0 +1,25 @@
+<html>
+
+<head>
+    <title>Client</title>
+    <script>
+        const eventEmitter = new EventTarget();
+        eventEmitter.addEventListener("customEvent1", (...eventParams) => {
+            console.log("customEvent1 fired:", eventParams);
+        })
+
+        eventEmitter.dispatchEvent(new CustomEvent("customEvent1", {
+            detail: "hello"
+        }));
+
+    </script>
+</head>
+
+<body>
+    <h1>Client</h1>
+    <p>Client page</p>
+    <button onclick="eventEmitter.dispatchEvent(new CustomEvent('customEvent1', {
+        detail: 'hello'
+    }))">test event</button>
+
+</html>
