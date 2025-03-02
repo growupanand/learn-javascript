@@ -1,0 +1,58 @@
+<html>
+
+<head>
+    <title>Client</title>
+    <script>
+
+        /**
+         * Two ways to receive data from server side event
+         * 1. Using fetch
+         * 2. Using EventSource
+        **/
+
+
+
+        // ======== 1. Using fetch ==========
+
+        const decoder = new TextDecoder();
+        const handleSendRequest = async () => {
+            const response = await fetch('/stream');
+            const reader = response.body.getReader();
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) {
+                    break;
+                }
+                const decodedValue = decoder.decode(value);
+                console.log({ decodedValue })
+            }
+        }
+
+        // ========= 2. Using EventSource =========
+
+        const eventSource = new EventSource('/stream');
+        eventSource.addEventListener('customMessage', (event) => {
+            console.log({
+                eventData: event.data,
+                event
+            });
+        })
+
+        eventSource.addEventListener('jsonData', (event) => {
+            const eventData = JSON.parse(event.data);
+            console.log({
+                eventData,
+                event
+            });
+        })
+
+
+    </script>
+</head>
+
+<body>
+    <h1>Client</h1>
+    <p>Client page</p>
+    <button onclick="handleSendRequest()">Send request</button>
+
+</html>
