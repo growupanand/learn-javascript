@@ -1,6 +1,6 @@
 import { Bus, type BusInstance, handlerFor } from '@node-ts/bus-core'
 
-import { Event } from '@node-ts/bus-messages'
+import { Command, Event } from '@node-ts/bus-messages'
 
 
 class Balance {
@@ -23,44 +23,60 @@ class Balance {
 }
 const totalAmount = new Balance(1000);
 
-
-export class MoneyPaid extends Event {
-
+// ========= Events ===================
+class MoneyPaid extends Event {
   $name = 'expenses/money-paid'
-
-
   $version = 0
-
-
   constructor(
     readonly amount: number,
+    readonly bus: BusInstance
   ) {
     super();
   }
 }
 
-export const moneyPaidHandler = handlerFor(
+const moneyPaidHandler = handlerFor(
   MoneyPaid,
-  async (event) => {
-    console.log(`Money paid: ${event.amount}`);
+  async (event, bus) => {
+    console.log(`Event Money paid: ${event.amount}`);
     totalAmount.deduct(event.amount);
+    // Publish another event using the bus from context
+    event.bus.publish(new BalanceUpdated(totalAmount.amount));
+  }
+)
+
+
+class BalanceUpdated extends Event {
+  $name = 'expenses/balance-updated'
+  $version = 0
+  constructor(
+    readonly newBalance: number,
+  ) {
+    super();
+  }
+}
+
+const balanceUpdatedHandler = handlerFor(
+  BalanceUpdated,
+  async (event) => {
+    console.log(`Event Balance updated: ${event.newBalance}`);
   }
 )
 
 
 
 
-
-
-
 const start = async () => {
   const bus = Bus.configure()
-    .withHandler(moneyPaidHandler).build();
+    .withHandler(moneyPaidHandler)
+    .withHandler(balanceUpdatedHandler)
+    .build();
   console.log("initializing bus");
   await bus.initialize();
   console.log("starting bus");
   // Start the bus to commence processing messages
   await bus.start()
+  console.log(`App initialized with money: ${totalAmount.amount}`);
   await app(bus);
 }
 
@@ -69,10 +85,6 @@ start();
 
 
 async function app(bus: BusInstance) {
-  totalAmount.checkBalance();
-  await bus.publish(new MoneyPaid(100));
-  // Add delay to allow event handling to complete
-  await new Promise(resolve => setTimeout(resolve, 100));
-  totalAmount.checkBalance();
+  await bus.publish(new MoneyPaid(100, bus));
 
 }
