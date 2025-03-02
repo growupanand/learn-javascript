@@ -1,4 +1,4 @@
-import EventEmitter from "node:events";
+import EventEmitter, { errorMonitor } from "node:events";
 
 // const emitter = new EventEmitter();
 
@@ -117,5 +117,61 @@ const myEmitter = new MyEmitter();
 
 
 // =====================================================================
+
+/**
+ * async events
+ * you can use await inside async events
+ * but all the async events will be executed in parallel
+ * 
+ * log:
+ * [nodemon] restarting due to changes...
+[nodemon] starting `ts-node index.ts`
+my event fired prepend: [ { name: 'utkarsh' }, 'hello', 'world' ]
+called inside class event:hello fired: [ { name: 'utkarsh' }, 'hello', 'world' ]
+async event fired 2: [ 'async hello' ]
+async event fired 2: [ 'async hello' ]
+async event fired: [ 'async hello' ]
+async event fired: [ 'async hello' ]
+[nodemon] clean exit - waiting for changes before restart
+ */
+
+// myEmitter.on("async:call", async (...eventName) => {
+//   await new Promise(resolve => setTimeout(resolve, 4000));
+//   console.log("async event fired:", eventName);
+// })
+
+// myEmitter.on("async:call", async (...eventName) => {
+//   await new Promise(resolve => setTimeout(resolve, 1000));
+//   console.log("async event fired 2:", eventName);
+// })
+
+// myEmitter.emit("async:call", "async hello");
+// myEmitter.emit("async:call", "async hello");
+
+
+// =====================================================================
+
+
+// myEmitter.on(
+//   errorMonitor, // <-- equivalent to .on("error", ...) but this will crash the Node.js process
+//   (...eventParams) => {
+//     console.log("error event fired:", eventParams);
+//   });
+
+// myEmitter.on(
+//   "error", // this will not crash the Node.js process
+//   (...eventParams) => {
+//     console.log("error event fired:", eventParams);
+//   });
+
+// myEmitter.on("test:error", (...eventParams) => {
+//   // throw new Error("error throw inside event"); // <-- this will crash the Node.js process
+//   myEmitter.emit("error", new Error("custom error message")); // <-- this will not crash the Node.js process, if you listen .on("error")
+// })
+
+
+
+// myEmitter.emit("test:error", "error data");
+
 
 myEmitter.sayHello();
